@@ -1,0 +1,17 @@
+ext {
+    dep = [
+            fabric_api                    : "net.fabricmc.fabric-api:fabric-api:$project.fabric_api",
+            fabric_language_kotlin        : "net.fabricmc:fabric-language-kotlin:$project.fabric_language_kotlin",
+
+            guice                         : "com.google.inject:guice:$project.guice",
+            guava                         : "com.google.guava:$project.guava",
+
+            sponge_configurate            : "org.spongepowered:configurate-yaml:$project.configurate",
+
+            adventure_api                 : "net.kyori:adventure-api:$project.adventure",
+            adventure_text_minimessage    : "net.kyori:adventure-text-minimessage:$project.adventure",
+            adventure_text_serializer_gson: "net.kyori:adventure-text-serializer-gson:$project.adventure_text_serializer_gson",
+
+            luckperms                     : "net.luckperms:api:$project.luckperms_version"
+    ]
+}

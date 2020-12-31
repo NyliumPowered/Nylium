@@ -1,0 +1,28 @@
+#Nylium is licensed under CC BY-SA 4.0.
+#To view a copy of this license, visit https://creativeco
+language:
+  pack:
+    version: 0.1
+    code: en
+    name: English
+    translators:
+      - ItsIlya:
+          minecraft: bf651b48-7395-4988-ae47-07f8f6b72a22
+          discord: ilya#4819
+          github: https://github.com/ItsIlya
+
+  test:
+    success: Language test was successful!
+    failed: Language test failed!
+
+command:
+  stop:
+    prompt: "Click here to stop the server"
+      hover: "<$secondary>Click to confirm"
+  gamemode:
+    invalid: "<$error>Plese enter a valid gamemode"
+    set: "Set own gamemode to <$select>%gamemode%"
+      others: "Set gamemode to <$select>%gamemode%</$select> for <$target>%target%"
+        multiple: "Set gamemode to <$select>%gamemode%</$select> for <$target>%index% player"
+
+        

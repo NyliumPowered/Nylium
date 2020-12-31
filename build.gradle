@@ -1,0 +1,177 @@
+import net.fabricmc.loom.task.RemapJarTask
+
+plugins {
+    id("fabric-loom") version "$fabric_loom" apply false
+    id("java")
+    id("org.jetbrains.kotlin.jvm") version "$kotlin"
+    id("maven-publish")
+    id("net.minecrell.licenser") version "$licenser"
+    id("com.github.johnrengelman.shadow") version "$shadow"
+    id("com.palantir.git-version") version "$git_version"
+}
+
+apply(from: "./nylium.gradle")  // dep.*
+
+gradle.taskGraph.beforeTask { task ->
+    logger.lifecycle("""
+        ==--==--====--==--====--==--====--==--====--==--==
+        Running "$task.name" task for Nylium $version
+    
+        Minecraft: $project.minecraft_version
+        Loader: $project.loader_version
+        Yarn: $project.yarn_mappings
+        Fabric API: $project.fabric_api
+        ==--==--====--==--====--==--====--==--====--==--==
+    """.stripIndent())
+}
+
+gradle.taskGraph.afterTask { task ->
+    logger.info("Finished task '$task.name' for Nylium $version")
+}
+
+group = "io.github.nyliumpowered.nylium"
+version = project.version
+
+allprojects { project ->
+    apply(plugin: "fabric-loom")
+    apply(plugin: "maven-publish")
+    apply(plugin: "org.jetbrains.kotlin.jvm")
+    apply(plugin: "net.minecrell.licenser")
+    apply(plugin: "com.github.johnrengelman.shadow")
+    apply(plugin: "com.palantir.git-version")
+
+    project.version = rootProject.version
+    project.group = rootProject.group
+    project.buildDir = rootProject.buildDir
+
+    license {
+        header = rootProject.file("LICENSE")
+        include("**/*.java", "**/*.kt")
+    }
+
+    configurations {
+        dev
+        compileOnly.extendsFrom shade
+        compileOnly.extendsFrom shadeSource
+        modCompileOnly.extendsFrom modShade
+    }
+
+    jar {
+        enabled = false
+    }
+
+    remapJar {
+        enabled = false
+    }
+
+    shadowJar {
+        enabled = true
+        // Only shadow implementation/modImplementation
+        configurations = [project.configurations.shade, project.configurations.modShade]
+        archiveClassifier.convention("dev")
+        archiveClassifier.set("dev")
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier.convention("sources")
+        archiveClassifier.set("sources")
+        from project.sourceSets.main.allSource.srcDirs
+    }
+
+    task remapShadowJar(type: RemapJarTask, dependsOn: shadowJar) {
+        afterEvaluate {
+            input = file("${project.buildDir}/libs/${archivesBaseName}-${rootProject.version}-dev.jar")
+            archiveName = "${project.archivesBaseName}-${project.version}.jar"
+            addNestedDependencies = true
+            remapAccessWidener = true
+        }
+    }
+
+    task remapMavenJar(type: RemapJarTask, dependsOn: shadowJar) {
+        afterEvaluate {
+            input = file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-dev.jar")
+            archiveName = "${project.archivesBaseName}-${project.version}-maven.jar"
+            addNestedDependencies = false
+            remapAccessWidener = true
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url = "https://jitpack.io" }
+        maven { url = "http://server.bbkr.space:8081/artifactory/libs-release" }
+        maven { url = "https://repo.spongepowered.org/maven" }
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url = "https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/" }
+    }
+
+    dependencies {
+        // Kotlin Standard Library (JDK 8)
+        compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${project.kotlin}"
+
+        //to change the versions see the gradle.properties file
+        minecraft("com.mojang:minecraft:${project.minecraft_version}") {
+            transitive = false
+        }
+        mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+        modImplementation dep.fabric_api
+        modRuntime dep.fabric_language_kotlin
+
+        implementation dep.guice
+        implementation dep.sponge_configurate
+        implementation dep.adventure_api
+        implementation dep.adventure_text_minimessage
+        implementation dep.adventure_text_serializer_gson
+        implementation dep.luckperms
+    }
+
+    // Set version in fabric.mod.json
+    processResources {
+        inputs.property "version", project.version
+
+        from(sourceSets.main.resources.srcDirs) {
+            include "fabric.mod.json"
+            expand "version": project.version,
+                    "fabric_api": project.fabric_api,
+                    "minecraft": project.minecraft_version
+        }
+
+        from(sourceSets.main.resources.srcDirs) {
+            exclude "fabric.mod.json"
+        }
+    }
+
+    build.dependsOn(shadowJar, remapShadowJar, sourcesJar, remapSourcesJar)
+    rootProject.publish.dependsOn(shadowJar, remapMavenJar, sourcesJar, remapSourcesJar)
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlin {
+        compileKotlin.kotlinOptions.jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    subprojects.each {
+        shade project(path: ":${it.name}", configuration: "shadow")
+    }
+}
+
+subprojects {
+    runClient.enabled = false
+    runServer.enabled = false
+}
+
+rootProject.runClient.enabled = false
+jar.enabled = false
+sourcesJar.enabled = false
+shadowJar.enabled = false
+remapJar.enabled = false
+remapSourcesJar.enabled = false
+remapShadowJar.enabled = false
+remapMavenJar.enabled = false

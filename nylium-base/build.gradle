@@ -1,0 +1,21 @@
+archivesBaseName = "nylium-base"
+
+dependencies {
+    compile(project(":nylium-api"))
+
+    include(dep.guice)
+    include(dep.sponge_configurate)
+    include(dep.adventure_api)
+    include(dep.adventure_text_minimessage)
+    include(dep.adventure_text_serializer_gson)
+}
+
+minecraft {
+}
+
+sourceSets {
+    main {
+        java.srcDir("${rootProject.rootDir}/nylium-api/src/main/java")
+        kotlin.srcDir("${rootProject.rootDir}/nylium-api/src/main/kotlin")
+    }
+}

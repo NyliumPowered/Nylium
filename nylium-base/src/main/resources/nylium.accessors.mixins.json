@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.nyliumpowered.nylium.base.mixin.accessor",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerManagerAccessor",
+    "TeamAccessor"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
