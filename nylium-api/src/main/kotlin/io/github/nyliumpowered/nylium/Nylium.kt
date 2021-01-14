@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger
 
 interface Nylium {
     val logger: Logger
+    val builders: BuilderRegistry
 
     companion object {
         @Inject
@@ -18,6 +19,7 @@ interface Nylium {
 
         @JvmStatic
         val isDev
+            //TODO: Move this to NyliumDebugFactory in the future
             get() = SharedConstants.isDevelopment || FabricLoader.getInstance().isDevelopmentEnvironment
     }
 }

@@ -21,6 +21,7 @@ import net.minecraft.text.Text as NativeText
 object Components {
     @JvmStatic
     fun toNativeText(component: Component): NativeText = toNativeTextOrNull(component) ?: NativeLiteralText.EMPTY
+    
     @JvmStatic
     fun toNativeTextOrNull(component: Component): NativeText? = try {
         NativeText.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component))
