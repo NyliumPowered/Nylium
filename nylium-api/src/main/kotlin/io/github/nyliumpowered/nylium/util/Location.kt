@@ -15,9 +15,9 @@ import net.minecraft.world.World
  * Represents a Location inside of a dimension with a rotation.
  */
 data class Location(
-        val position: Vec3d,
-        val rotation: Vec2f? = null,
-        val dimension: Identifier
+        val pos: Vec3d,
+        val rot: Vec2f?,
+        val dim: Identifier
 ) {
     constructor(
             position: Vec3d,
@@ -95,10 +95,10 @@ data class Location(
      */
     fun offset(distance: Int = 1, direction: Direction) = if (distance == 0) this else Location(
             Vec3d(
-                    position.x + direction.offsetX * distance,
-                    position.y + direction.offsetY * distance,
-                    position.z + direction.offsetZ * distance
-            ), rotation, dimension
+                    pos.x + direction.offsetX * distance,
+                    pos.y + direction.offsetY * distance,
+                    pos.z + direction.offsetZ * distance
+            ), rot, dim
     )
 
     /**
@@ -107,13 +107,13 @@ data class Location(
      */
     fun axisAlignedRotate(rotation: BlockRotation) = when (rotation) {
         BlockRotation.CLOCKWISE_90 -> {
-            Location(Vec3d(-position.z, position.y, position.x), this.rotation, dimension)
+            Location(Vec3d(-pos.z, pos.y, pos.x), this.rot, dim)
         }
         BlockRotation.CLOCKWISE_180 -> {
-            Location(Vec3d(-position.x, position.y, -position.z), this.rotation, dimension)
+            Location(Vec3d(-pos.x, pos.y, -pos.z), this.rot, dim)
         }
         BlockRotation.COUNTERCLOCKWISE_90 -> {
-            Location(Vec3d(position.z, position.y, -position.x), this.rotation, dimension)
+            Location(Vec3d(pos.z, pos.y, -pos.x), this.rot, dim)
         }
         else -> this
     }
@@ -129,7 +129,7 @@ data class Location(
      * Returns a new Location with the rotation provided and the position and dimension of this Location.
      * @param vector the Yaw and Pitch rotations
      */
-    fun withRotation(vector: Vec2f) = if (vector == rotation) this else Location(position, vector, dimension)
+    fun withRotation(vector: Vec2f) = if (vector == rot) this else Location(pos, vector, dim)
 
     /**
      * Returns a new Location with the dimension provided and the position and rotation of this Location.
@@ -141,7 +141,7 @@ data class Location(
      * Returns a new Location with the dimension provided and the position and rotation of this Location.
      * @param dimension the Identifier of the dimension
      */
-    fun withDimension(dimension: Identifier) = if (dimension == this.dimension) this else Location(position, rotation, dimension)
+    fun withDimension(dimension: Identifier) = if (dimension == this.dim) this else Location(pos, rot, dimension)
 
     /**
      * Returns a new Location with the dimension provided and the position and rotation of this Location.
@@ -161,21 +161,24 @@ data class Location(
      * Returns a new Location with the dimension provided and the position and rotation of this Location.
      * @param vector The position to set
      */
-    fun withPosition(vector: Vec3d) = if (vector == position) this else Location(vector, rotation, dimension)
+    fun withPosition(vector: Vec3d) = if (vector == pos) this else Location(vector, rot, dim)
     fun withPosition(vector: Vec3i) = withPosition(Vec3d(vector.x.toDouble(), vector.y.toDouble(), vector.z.toDouble()))
 
     inline val x: Double
-        get() = position.x
+        get() = pos.x
 
     inline val y: Double
-        get() = position.y
+        get() = pos.y
 
     inline val z: Double
-        get() = position.z
+        get() = pos.z
 
     inline val yaw: Float?
-        get() = rotation?.x
+        get() = rot?.x
 
     inline val pitch: Float?
-        get() = rotation?.y
+        get() = rot?.y
 }
+
+inline val Entity.location
+    get() = Location.of(this)
