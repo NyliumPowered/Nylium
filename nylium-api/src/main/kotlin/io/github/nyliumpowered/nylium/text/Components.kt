@@ -2,6 +2,8 @@ package io.github.nyliumpowered.nylium.text
 
 import com.google.gson.JsonIOException
 import com.google.gson.JsonParseException
+import io.github.nyliumpowered.nylium.util.InternalUseOnly
+import io.github.nyliumpowered.nylium.util.Location
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
@@ -16,69 +18,95 @@ import net.minecraft.util.Identifier
 import net.minecraft.text.LiteralText as NativeLiteralText
 import net.minecraft.text.Text as NativeText
 
-interface Components {
-    companion object {
-        fun builder(builder: Builder.() -> Unit): Component {
-            TODO("Not yet implemented.")
-        }
-
-        @JvmStatic
-        fun toNativeText(component: Component): NativeText = toNativeTextOrNull(component) ?: NativeLiteralText.EMPTY
-
-        @JvmStatic
-        fun toNativeTextOrNull(component: Component): NativeText? = try {
-            NativeText.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component))
-        } catch (ex: JsonParseException) {
-            null
-        }
-
-        @JvmStatic
-        fun fromNativeText(native: NativeText): Component {
-            return GsonComponentSerializer.gson().deserialize(NativeText.Serializer.toJson(native))
-        }
-
-        @JvmStatic
-        fun fromNativeTextOrNull(native: NativeText): Component? = try {
-            GsonComponentSerializer.gson().deserialize(NativeText.Serializer.toJson(native))
-        } catch (ex: JsonIOException) {
-            null
-        }
+object Components {
+    @JvmStatic
+    fun toNativeText(component: Component): NativeText = toNativeTextOrNull(component) ?: NativeLiteralText.EMPTY
+    @JvmStatic
+    fun toNativeTextOrNull(component: Component): NativeText? = try {
+        NativeText.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component))
+    } catch (ex: JsonParseException) {
+        null
     }
 
-    interface Builder {
-        val base: TextComponent.Builder
-
-        fun newline(amount: Int = 1)
-        fun space(amount: Int = 1)
-
-        fun append(content: String)
-        fun append(content: String, style: StyleBuilder.() -> Unit)
-
-        fun append(component: ComponentLike)
-        fun append(vararg component: ComponentLike)
+    @JvmStatic
+    fun fromNativeText(native: NativeText): Component {
+        return GsonComponentSerializer.gson().deserialize(NativeText.Serializer.toJson(native))
     }
 
-    interface StyleBuilder {
-        var color: TextColor
-        var font: Key?
-
-        fun apply(applicable: StyleBuilderApplicable)
-
-        fun color(hex: String)
-        fun color(intValue: Int)
-        fun color(rgb: RGBLike)
-        fun color(r: Int, g: Int, b: Int)
-
-        fun font(id: String)
-        fun font(id: Identifier)
-
-        fun decorate(vararg decoration: TextDecoration)
-        fun decoration(decoration: TextDecoration, flag: Boolean)
-        fun decoration(decoration: TextDecoration, state: TextDecoration.State)
-
-        fun merge(that: Style): StyleBuilder
-        fun merge(that: Style, strategy: Style.Merge.Strategy): StyleBuilder
-        fun merge(that: Style, vararg merges: Style.Merge): StyleBuilder
-        fun merge(that: Style, strategy: Style.Merge.Strategy, vararg merges: Style.Merge): StyleBuilder
+    @JvmStatic
+    fun fromNativeTextOrNull(native: NativeText): Component? = try {
+        GsonComponentSerializer.gson().deserialize(NativeText.Serializer.toJson(native))
+    } catch (ex: JsonIOException) {
+        null
     }
+}
+
+fun component(builder: ComponentBuilder.() -> Unit): Component {
+    TODO("Not yet implemented.")
+}
+
+interface ComponentBuilder {
+    fun newline(amount: Int = 1)
+    fun whitespace(amount: Int = 1)
+
+    fun append(component: ComponentLike)
+    fun append(vararg component: ComponentLike)
+
+    fun text(content: String)
+    fun text(content: String, style: ComponentStyleBuilder.() -> Unit)
+
+    fun score(name: String, objective: String, value: String)
+    fun score(name: String, objective: String, value: String, style: ComponentStyleBuilder.() -> Unit)
+
+    fun selector(pattern: String)
+    fun selector(pattern: String, style: ComponentStyleBuilder.() -> Unit)
+
+    fun blockNbt(path: String, location: Location)
+    fun blockNbt(path: String, location: Location, style: ComponentStyleBuilder.() -> Unit)
+
+    fun entityNbt(path: String, selector: String)
+    fun entityNbt(path: String, selector: String, style: ComponentStyleBuilder.() -> Unit)
+
+    fun storageNbt(path: String, key: Key)
+    fun storageNbt(path: String, key: Key, style: ComponentStyleBuilder.() -> Unit)
+
+    fun keybind(key: String)
+    fun keybind(key: String, style: ComponentStyleBuilder.() -> Unit)
+
+    fun translatable(key: String)
+    fun translatable(key: String, style: ComponentStyleBuilder.() -> Unit)
+}
+
+interface ComponentStyleBuilder {
+    var color: TextColor
+    var font: Key?
+
+    fun apply(applicable: StyleBuilderApplicable)
+
+    fun color(hex: String)
+    fun color(intValue: Int)
+    fun color(rgb: RGBLike)
+    fun color(r: Int, g: Int, b: Int)
+
+    fun font(id: String)
+    fun font(id: Identifier)
+
+    fun decorate(vararg decoration: TextDecoration)
+    fun decoration(decoration: TextDecoration, flag: Boolean)
+    fun decoration(decoration: TextDecoration, state: TextDecoration.State)
+
+    fun merge(that: Style): ComponentStyleBuilder
+    fun merge(that: Style, strategy: Style.Merge.Strategy): ComponentStyleBuilder
+    fun merge(that: Style, vararg merges: Style.Merge): ComponentStyleBuilder
+    fun merge(that: Style, strategy: Style.Merge.Strategy, vararg merges: Style.Merge): ComponentStyleBuilder
+}
+
+fun NativeText.toComponent() = Components.fromNativeText(this)
+fun NativeText.toComponentOrNull() = Components.fromNativeTextOrNull(this)
+fun Component.toNative() = Components.toNativeText(this)
+fun Component.toNativeOrNull() = Components.toNativeTextOrNull(this)
+
+@InternalUseOnly
+interface BaseBuilder : ComponentBuilder, Function<Component> {
+    val base: TextComponent.Builder
 }

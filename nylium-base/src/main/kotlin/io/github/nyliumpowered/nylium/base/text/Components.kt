@@ -5,14 +5,13 @@ import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TextComponent
 import io.github.nyliumpowered.nylium.text.Components as ApiComponents
 
-@Suppress("OVERRIDE_BY_INLINE")
 class Components {
-    class Builder(override val base: TextComponent.Builder) : ApiComponents.Builder {
+    class Builder(override val base: TextComponent.Builder) : ApiComponents.BaseBuilder {
         override fun newline(amount: Int) = repeat(amount) {
             base.append(Component.newline())
         }
 
-        override fun space(amount: Int) = repeat(amount) {
+        override fun whitespace(amount: Int) = repeat(amount) {
             base.append(Component.space())
         }
 
