@@ -179,6 +179,3 @@ data class Location(
     inline val pitch: Float?
         get() = rot?.y
 }
-
-inline val Entity.location
-    get() = Location.of(this)
