@@ -4,7 +4,6 @@ import com.google.gson.JsonIOException
 import com.google.gson.JsonParseException
 import io.github.nyliumpowered.nylium.Nylium
 import io.github.nyliumpowered.nylium.util.BuilderFactory
-import io.github.nyliumpowered.nylium.util.InternalUseOnly
 import io.github.nyliumpowered.nylium.util.Location
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -21,7 +20,7 @@ import net.minecraft.text.Text as NativeText
 
 @JvmSynthetic
 fun component(builder: ComponentBuilder.() -> Unit): Component =
-        Nylium.instance.builders(ComponentBuilder::class.java) { builder }
+        Nylium.instance.builders(ComponentBuilder::class.java, builder)
 
 object Components {
     @JvmStatic

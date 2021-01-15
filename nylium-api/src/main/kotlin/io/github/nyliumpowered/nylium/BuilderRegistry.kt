@@ -14,5 +14,5 @@ interface BuilderRegistry {
 
     fun <T> getOrNull(clazz: Class<T>): T?
 
-    operator fun <I, R, T : BuilderFactory<R>> invoke(clazz: Class<T>, builder: (Unit) -> I): R
+    operator fun <I, R, T : BuilderFactory<R>> invoke(clazz: Class<T>, builder: Function<I>): R
 }
