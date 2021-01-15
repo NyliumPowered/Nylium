@@ -80,28 +80,28 @@ interface ComponentBuilder : BuilderFactory<Component> {
     fun translatable(key: String, style: ComponentStyleBuilder.() -> Unit)
 }
 
-interface ComponentStyleBuilder {
-    var color: TextColor
+interface ComponentStyleBuilder : BuilderFactory<Style> {
+    var color: TextColor?
     var font: Key?
+
     fun apply(applicable: StyleBuilderApplicable)
 
     fun color(hex: String)
-
     fun color(intValue: Int)
     fun color(rgb: RGBLike)
     fun color(r: Int, g: Int, b: Int)
+
     fun font(id: String)
-
     fun font(id: Identifier)
-    fun decorate(vararg decoration: TextDecoration)
 
+    fun decorate(vararg decoration: TextDecoration)
     fun decoration(decoration: TextDecoration, flag: Boolean)
     fun decoration(decoration: TextDecoration, state: TextDecoration.State)
-    fun merge(that: Style): ComponentStyleBuilder
 
-    fun merge(that: Style, strategy: Style.Merge.Strategy): ComponentStyleBuilder
-    fun merge(that: Style, vararg merges: Style.Merge): ComponentStyleBuilder
-    fun merge(that: Style, strategy: Style.Merge.Strategy, vararg merges: Style.Merge): ComponentStyleBuilder
+    fun merge(that: Style)
+    fun merge(that: Style, strategy: Style.Merge.Strategy)
+    fun merge(that: Style, vararg merges: Style.Merge)
+    fun merge(that: Style, strategy: Style.Merge.Strategy, vararg merges: Style.Merge)
 }
 
 fun NativeText.toComponent() = Components.fromNativeText(this)
