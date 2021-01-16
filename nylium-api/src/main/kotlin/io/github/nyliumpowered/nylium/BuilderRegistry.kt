@@ -1,5 +1,6 @@
 package io.github.nyliumpowered.nylium
 
+import io.github.nyliumpowered.nylium.text.ComponentBuilder
 import io.github.nyliumpowered.nylium.util.BuilderFactory
 import java.util.function.Supplier
 
@@ -7,7 +8,7 @@ import java.util.function.Supplier
 interface BuilderRegistry {
     val entries: Map<Class<*>, Supplier<*>>
 
-    fun <T, S : T> register(clazz: Class<T>, supplier: () -> S)
+    fun <T : BuilderFactory<*>, S : T> register(clazz: Class<T>, supplier: () -> S)
 
     @Throws(IllegalArgumentException::class)
     operator fun <T> get(clazz: Class<T>): T

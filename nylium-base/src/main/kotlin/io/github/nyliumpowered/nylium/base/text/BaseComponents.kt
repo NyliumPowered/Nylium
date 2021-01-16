@@ -111,9 +111,8 @@ object BaseComponents {
         override fun build() = base.build()
     }
 
-    private fun Component.style(style: ApiStyleBuilder.() -> Unit): Component {
-        this.style(Nylium.instance.builders(ApiStyleBuilder::class.java, style))
-        return this
+    private fun Component.style(style: ApiStyleBuilder.() -> Unit) = apply {
+        style(Nylium.instance.builders(ApiStyleBuilder::class.java, style))
     }
 
     class ComponentStyleBuilder : ApiStyleBuilder {
