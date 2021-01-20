@@ -1,6 +1,5 @@
 package io.github.nyliumpowered.nylium
 
-import io.github.nyliumpowered.nylium.text.ComponentBuilder
 import io.github.nyliumpowered.nylium.util.BuilderFactory
 import java.util.function.Supplier
 

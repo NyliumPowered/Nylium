@@ -103,8 +103,3 @@ interface ComponentStyleBuilder : BuilderFactory<Style> {
     fun merge(that: Style, vararg merges: Style.Merge)
     fun merge(that: Style, strategy: Style.Merge.Strategy, vararg merges: Style.Merge)
 }
-
-fun NativeText.toComponent() = Components.fromNativeText(this)
-fun NativeText.toComponentOrNull() = Components.fromNativeTextOrNull(this)
-fun Component.toNative() = Components.toNativeText(this)
-fun Component.toNativeOrNull() = Components.toNativeTextOrNull(this)
